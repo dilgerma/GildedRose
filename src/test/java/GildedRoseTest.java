@@ -57,34 +57,37 @@ public class GildedRoseTest {
 
     @Test
     public void brieGetsBetterWithAge() {
-        Item inventoryItem = buildGildedRoseAndUpdateQuality(new AgedBrieItem(5, 5));
-        assertEquals(4, inventoryItem.getSellIn());
-        assertEquals(6, inventoryItem.getQuality());
+        GildedRose gildedRose = new GildedRose(Arrays.asList(new Item(GildedRose.AGED_BRIE, 5, 5)));
+        gildedRose.timePassed();
+        ;
+        final Item inventoryItem = gildedRose.getInventoryItem(GildedRose.AGED_BRIE);
+        assertEquals(inventoryItem.getSellIn(), 4);
+        assertEquals(inventoryItem.getQuality(), 6);
     }
 
     @Test
     public void maxQualityOfBrieIs50() {
-        GildedRose gildedRose = new GildedRose(Arrays.asList(new AgedBrieItem(5, 49)));
+        GildedRose gildedRose = new GildedRose(Arrays.asList(new Item(GildedRose.AGED_BRIE, 5, 49)));
         gildedRose.timePassed();
         ;
         gildedRose.timePassed();
         ;
-        final Item inventoryItem = gildedRose.getInventoryItem(AgedBrieItem.AGED_BRIE);
+        final Item inventoryItem = gildedRose.getInventoryItem(GildedRose.AGED_BRIE);
         assertEquals(inventoryItem.getSellIn(), 3);
         assertEquals(inventoryItem.getQuality(), 50);
     }
 
     @Test
     public void sulfurasNeverDecreasesInQuality() {
-        final Item testItem = new SulfurasItem();
+        final Item testItem = new Item(GildedRose.SULFURAS, 5, 5);
         final Item inventoryItem = buildGildedRoseAndUpdateQuality(testItem);
-        assertEquals(80, inventoryItem.getQuality());
-        assertEquals(0, inventoryItem.getSellIn());
+        assertEquals(5, inventoryItem.getQuality());
+        assertEquals(5, inventoryItem.getSellIn());
     }
 
     @Test
     public void agedBrieQualityNeverIncreasesToMoreThan50() {
-        final Item testItem = new AgedBrieItem(0, 50);
+        final Item testItem = new Item(GildedRose.AGED_BRIE, 0, 50);
         final Item agedBrieInventory = buildGildedRoseAndUpdateQuality(testItem);
         assertEquals(-1, agedBrieInventory.getSellIn());
         assertEquals(50, agedBrieInventory.getQuality());
@@ -92,7 +95,7 @@ public class GildedRoseTest {
 
     @Test
     public void agedBrieIncreasesTwiceAsFastInQualityEventWhenSellInDateReached() {
-        final Item testItem = new AgedBrieItem(0, 1);
+        final Item testItem = new Item(GildedRose.AGED_BRIE, 0, 1);
         final Item agedBrieInventory = buildGildedRoseAndUpdateQuality(testItem);
         assertEquals(3, agedBrieInventory.getQuality());
     }
@@ -113,33 +116,42 @@ public class GildedRoseTest {
         assertEquals(-2, inventoryItem.getSellIn());
     }
 
+    @Test
+    public void sulfurasQualityDoesNotDegradeWithNegativeSellIn() {
+        final Item testItem = new Item(GildedRose.SULFURAS, -1, 5);
+        final Item inventoryItem = buildGildedRoseAndUpdateQuality(testItem);
+        assertEquals(-1, inventoryItem.getSellIn());
+        assertEquals(5, inventoryItem.getQuality());
+    }
 
     @Test
     public void backstagePassesLoseQualityWhenSelloutDateReached() {
-        final Item inventoryItem = buildGildedRoseAndUpdateQuality(new BackstagePassesItem("backstage", 0, 50));
+        final Item inventoryItem = buildGildedRoseAndUpdateQuality(new Item(GildedRose.BACKSTAGE_PASSES, 0, 50));
         assertEquals(0, inventoryItem.getQuality());
         assertEquals(-1, inventoryItem.getSellIn());
     }
 
     @Test
     public void backstagePassesIncreaseTwiceAsFastFrom11DaysBeforeConcert() {
-        final Item inventoryItem = buildGildedRoseAndUpdateQuality(new BackstagePassesItem("backstage", 10, 2));
+        final Item inventoryItem = buildGildedRoseAndUpdateQuality(new Item(GildedRose.BACKSTAGE_PASSES, 10, 2));
         assertEquals(4, inventoryItem.getQuality());
         assertEquals(9, inventoryItem.getSellIn());
     }
 
     @Test
     public void backstagePassesIncreaseTrippleAsFastFrom6DaysBeforeConcert() {
-        final Item inventoryItem = buildGildedRoseAndUpdateQuality(new BackstagePassesItem("backstage", 5, 2));
+        final Item inventoryItem = buildGildedRoseAndUpdateQuality(new Item(GildedRose.BACKSTAGE_PASSES, 5, 2));
         assertEquals(5, inventoryItem.getQuality());
         assertEquals(4, inventoryItem.getSellIn());
     }
 
     @Test
-    public void conjuredItemsDegradeTwiceAsFastAsNormalItems() {
-        final Item conjuredItem = buildGildedRoseAndUpdateQuality(new ConjuredItem("conjured", 10, 5));
+    public void conjuredItem() {
+        final Item conjuredItem = buildGildedRoseAndUpdateQuality(new Item(GildedRose.CONJURED_ITEM, 5, 5));
         assertEquals(3, conjuredItem.getQuality());
+        assertEquals(4, conjuredItem.getSellIn());
     }
+
 
     private GildedRose newGildedRose(Item... item) {
         List<Item> items = Arrays.asList(item);
